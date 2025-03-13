@@ -1,51 +1,23 @@
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
-import { userModel } from "../dao/models/user.js";
-import { comparePassword } from "../utils/bcrypt.js";
-import dotenv from "dotenv";
+import passport from 'passport';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import User  from '../models/user.model.js'; // Asegúrate de que 'User' esté importado correctamente
+import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config(); // Asegúrate de cargar las variables de entorno
 
-// Estrategia Local (Login con email y contraseña)
+const options = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET, // Aquí usas el secreto de las variables de entorno
+};
+
 passport.use(
-  new LocalStrategy(
-    { usernameField: "email", passwordField: "password" },
-    async (email, password, done) => {
-      try {
-        const user = await userModel.findOne({ email });
-        if (!user) return done(null, false, { message: "Usuario no encontrado" });
-
-        const isMatch = comparePassword(password, user.password);
-        if (!isMatch) return done(null, false, { message: "Contraseña incorrecta" });
-
-        return done(null, user);
-      } catch (error) {
-        return done(error);
-      }
+  new JwtStrategy(options, async (jwt_payload, done) => {
+    try {
+      const user = await User.findById(jwt_payload.id);
+      if (!user) return done(null, false); // Si no se encuentra el usuario
+      done(null, user); // Si se encuentra el usuario
+    } catch (error) {
+      done(error, false); // Manejo de errores
     }
-  )
+  })
 );
-
-// Estrategia JWT (Para verificar sesión)
-passport.use(
-  new JwtStrategy(
-    {
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (req) => req.cookies?.token, // Extraer de la cookie
-      ]),
-      secretOrKey: process.env.JWT_SECRET,
-    },
-    async (jwt_payload, done) => {
-      try {
-        const user = await userModel.findById(jwt_payload.id);
-        if (!user) return done(null, false, { message: "Token inválido" });
-        return done(null, user);
-      } catch (error) {
-        return done(error);
-      }
-    }
-  )
-);
-
-export default passport;

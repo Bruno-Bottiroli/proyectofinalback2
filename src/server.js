@@ -1,29 +1,26 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-import passport from "passport";
-import { connectDB } from "./config/db.js";
-import passportConfig from "./config/passport.js"; // Importamos la configuración de Passport
-import sessionsRoutes from "./routes/sessions.js";
+import express from 'express';
+import dotenv from 'dotenv';
+import conectarDB from './config/db.js';
+import userRoutes from './routes/user.routes.js';
+import cartRoutes from './routes/cart.routes.js';
+import ticketRoutes from './routes/ticket.routes.js';
+import passport from 'passport';
+import './config/passport.js';
+import productRoutes from './routes/product.routes.js';
 
 dotenv.config();
 const app = express();
 
-// Middlewares
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: true, credentials: true }));
-app.use(cookieParser());
 app.use(passport.initialize());
-
-// Conectar a MongoDB
-connectDB();
+// Conectar a la base de datos
+conectarDB();
 
 // Rutas
-app.use("/api/sessions", sessionsRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/tickets', ticketRoutes);
+app.use('/products', productRoutes)
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`servidor corriendo en el puerto ${PORT}`));
