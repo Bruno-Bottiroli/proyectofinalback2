@@ -1,4 +1,4 @@
-import { config } from "dotenv";
+import { config } from "dotenv"
 
 config();
 
@@ -12,4 +12,4 @@ export const CONFIG = {
     PORT: process.env.NODEMAILER_PORT,
     FROM: process.env.NODEMAILER_FROM,
   },
-};
+}

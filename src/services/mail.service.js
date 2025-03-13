@@ -1,17 +1,8 @@
-import { createTransport } from "nodemailer";
-import { CONFIG } from "../config/config.js";
-import { EMAIL_TYPES } from "../common/constants/email-types.js";
+import transporter from '../config/nodemailer.js'
 
 class MailService {
   constructor() {
-    this.transporter = createTransport({
-      host: CONFIG.MAIL.HOST,
-      port: CONFIG.MAIL.PORT,
-      auth: {
-        user: CONFIG.MAIL.USER,
-        pass: CONFIG.MAIL.PASSWORD,
-      },
-    });
+    this.transporter = transporter
   }
 
   async getMessageTemplate({ type, email }) {
@@ -23,57 +14,45 @@ class MailService {
     `;
 
     switch (type) {
-      case EMAIL_TYPES.WELCOME:
+      case 'WELCOME':
         message += `
           <h3 style="color: darkblue">
-            Bienvenido a nuestra App de Coder Eats!
+            Bienvenido a nuestra APP!
           </h3>
-
           <br>
-          
-          Gracias por registrarte en nuestra app.
+          Gracias por registrarte!
         `;
         break;
+      case 'THANK_YOU':
+        message += `
+          <h3 style="color: darkblue">
+            Gracias por tu compra!
+          </h3>
+          <br>
+          Agradecemos tu confianza en nuestra app.
+        `;
+        break
     }
 
-    message += `
-      <br>
-
-      <img
-        src="cid:logo"
-        alt="Logo de Coder Eats"
-        style="margin-top: 30px; width: 100px; height: 100px; object-fit: cover; border-radius: 50%;"
-      />
-
-      </body>
-    `;
-
-    return message;
+    return message
   }
 
-  async sendEmail({ to, subject, type }) {
+  async sendMail({ to, subject, type }) {
     try {
-      const html = await this.getMessageTemplate({ type, email: to });
+      const html = await this.getMessageTemplate({ type, email: to })
 
       const info = await this.transporter.sendMail({
-        from: CONFIG.MAIL.FROM,
+        from: process.env.NODEMAILER_FROM,
         to,
         subject,
         html,
-        attachments: [
-          {
-            filename: "logo.webp",
-            path: "./public/logo.webp",
-            cid: "logo",
-          },
-        ],
       });
 
-      console.log("Message sent: ", info.messageId);
+      console.log('Message sent: ', info.messageId)
     } catch (error) {
-      console.error("Error sending email: ", error);
+      console.error('Error sending email: ', error)
     }
   }
 }
 
-export const mailService = new MailService();
+export const mailService = new MailService()

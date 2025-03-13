@@ -1,8 +1,8 @@
-// src/services/product.service.js
-import Product from '../models/product.model.js';
+
+import Product from '../models/product.model.js'
 
 export const productService = {
-  // Crear un nuevo producto
+  
   createProduct: async (productData) => {
     try {
       const newProduct = new Product({
@@ -11,20 +11,20 @@ export const productService = {
         stock: productData.stock,
       });
 
-      await newProduct.save();
-      return newProduct;
+      await newProduct.save()
+      return newProduct
     } catch (error) {
-      throw new Error('Error al crear el producto: ' + error.message);
+      throw new Error('Error al crear el producto: ' + error.message)
     }
   },
 
-  // Obtener todos los productos
+  
   getAllProducts: async () => {
     try {
-      const products = await Product.find();
-      return products;
+      const products = await Product.find()
+      return products
     } catch (error) {
-      throw new Error('Error al obtener los productos: ' + error.message);
+      throw new Error('Error al obtener los productos: ' + error.message)
     }
   }
-};
+}

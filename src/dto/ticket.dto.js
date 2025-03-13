@@ -1,4 +1,4 @@
-import Joi from 'joi';
+import Joi from 'joi'
 
 export const TicketDTO = Joi.object({
   usuario: Joi.string().required(),
@@ -11,5 +11,5 @@ export const TicketDTO = Joi.object({
     })
   ).required(),
   total: Joi.number().positive().required(),
-});
+})
 

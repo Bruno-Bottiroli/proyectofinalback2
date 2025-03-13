@@ -1,9 +1,20 @@
-import Joi from 'joi';
+import Joi from 'joi'
 
-export const productDto = Joi.object({
-    nombre: Joi.string().required(),
-    descripcion: Joi.string().required(),
-    precio: Joi.number().required(),
-    stock: Joi.number().required(),
-    categoria: Joi.string().required(),
+export const productSchema = Joi.object({
+  name: Joi.string().required(),
+  price: Joi.number().required(),
+  stock: Joi.number().required(),
 });
+
+export class ProductDTO {
+  constructor({ _id, name, price, stock }) {
+    this.id = _id
+    this.name = name
+    this.price = price
+    this.stock = stock
+  }
+
+  static validate(product) {
+    return productSchema.validate(product)
+  }
+}

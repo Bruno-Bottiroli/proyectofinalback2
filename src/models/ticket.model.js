@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 const ticketSchema = new mongoose.Schema({
   user: {
@@ -16,6 +16,6 @@ const ticketSchema = new mongoose.Schema({
   },
 });
 
-const Ticket = mongoose.model('Ticket', ticketSchema);
+const Ticket = mongoose.model('Ticket', ticketSchema)
 
-export default Ticket; // Aquí exportamos el modelo Ticket correctamente
+export default Ticket

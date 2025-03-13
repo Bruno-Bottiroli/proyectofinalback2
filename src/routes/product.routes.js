@@ -1,22 +1,11 @@
-import express from 'express';
-import { productDto } from '../dto/product.dto.js';
-import { productController } from '../controllers/product.controller.js';
+import express from 'express'
+import { productController } from '../controllers/product.controller.js'
+import { authMiddleware } from '../middlewares/auth.middleware.js'
 
-const router = express.Router();
+const router = express.Router()
 
-// Ruta para agregar un producto
-router.post('/', async (req, res) => {
-  try {
-    const { error } = productDto.validate(req.body);
-    if (error) return res.status(400).json({ error: error.details[0].message });
+router.use(authMiddleware)
 
-    await productController.addProduct(req, res);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Ruta para obtener todos los productos
-router.get('/', productController.getAllProducts);
-
-export default router;
+router.post('/', productController.addProduct)
+router.get('/', productController.getAllProducts)
+export default router

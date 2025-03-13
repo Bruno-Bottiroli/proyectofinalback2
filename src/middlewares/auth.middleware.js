@@ -1,29 +1,24 @@
-import passport from 'passport';
-import jwt from 'jsonwebtoken';
-export const protegerRuta = (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, (err, usuario) => {
-    if (err || !usuario) {
-      return res.status(401).json({ mensaje: 'No autorizado' });
-    }
-    req.usuario = usuario;
-    next();
-  })(req, res, next);
-};
-
-
+import jwt from 'jsonwebtoken'
 
 export const authMiddleware = (req, res, next) => {
-  const token = req.headers['authorization'];
+  let token
 
-  if (!token) {
-    return res.status(403).json({ message: 'No se proporciona token de autenticación.' });
+  const authHeader = req.header('Authorization')
+  if (authHeader) {
+    token = authHeader.replace('Bearer ', '')
+  } else if (req.cookies && req.cookies.token) {
+    token = req.cookies.token
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: 'Token inválido.' });
-    }
-    req.user = decoded; // Aquí colocamos la información del usuario decodificada
-    next();
-  });
+  if (!token) {
+    return res.status(401).json({ message: 'Acceso denegado. No hay token proporcionado.' })
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    req.user = decoded
+    next()
+  } catch (error) {
+    res.status(401).json({ message: 'Token no válido.' })
+  }
 };
