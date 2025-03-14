@@ -15,12 +15,18 @@ const cartService = {
     if (!cart || !product) {
       throw new Error('Carrito o producto no encontrado.')
     }
-
+    
     const productInCart = cart.products.find(p => p.product.toString() === productId)
 
     if (productInCart) {
+      if (productInCart.quantity + 1 > product.stock) {
+        throw new Error('No hay suficiente stock disponible para este producto')
+      }
       productInCart.quantity += 1
     } else {
+      if (product.stock < 1) {
+        throw new Error('No hay suficiente stock disponible para este producto')
+      }
       cart.products.push({ product: productId, quantity: 1 })
     }
 
@@ -56,13 +62,13 @@ const cartService = {
 
     const total = cart.products.reduce((acc, item) => {
       if (isNaN(item.product.price)) {
-        throw new Error('El precio de un producto no es un número válido.');
+        throw new Error('El precio de un producto no es un número válido.')
       }
-      return acc + item.product.price * item.quantity;
-    }, 0);
+      return acc + item.product.price * item.quantity
+    }, 0)
 
     if (isNaN(total)) {
-      throw new Error('El total de la compra no es un número válido.');
+      throw new Error('El total de la compra no es un número válido.')
     }
 
     const ticket = new Ticket({
@@ -80,10 +86,10 @@ const cartService = {
       to: userEmail,
       subject: 'Gracias por tu compra',
       type: 'THANK_YOU',
-    });
+    })
 
     return { ticket }
   },
-};
+}
 
 export default cartService
